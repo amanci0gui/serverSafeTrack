@@ -1,6 +1,9 @@
+import { Role } from '@prisma/client';
 import { User } from '../entities/user.entity';
 import {
   IsEmail,
+  IsEnum,
+  IsOptional,
   IsString,
   Matches,
   MaxLength,
@@ -21,4 +24,8 @@ export class CreateUserDto{
 
   @IsString()
   name: string;
+
+  @IsOptional()
+  @IsEnum(Role)
+  role?: Role;
 }

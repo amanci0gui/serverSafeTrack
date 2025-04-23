@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt'
 import { User } from 'src/user/entities/user.entity';
 import { UserPayload } from './models/UserPayload';
 import { JwtService } from '@nestjs/jwt';
 import { UserToken } from './models/UserToken';
+import { UnauthorizedError } from './errors/unauthorized.error';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +21,8 @@ export class AuthService {
     const payload: UserPayload = {
       sub: user.id ?? 0,
       email: user.email,
-      name: user.name
+      name: user.name,
+      role: user.role
     };
 
     //gera o token jwt
@@ -34,6 +36,10 @@ export class AuthService {
 
   async validateUser(email: string, password: string) {
     const user  = await this.userService.findByEmail(email);
+
+    if(!user?.active) {
+      throw new UnauthorizedException('Conta desativada!')
+    }
 
     if (user){
       //Checar se a senha corresponde ao hash no banco
