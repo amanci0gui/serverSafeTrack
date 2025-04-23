@@ -5,6 +5,8 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { UserModule } from 'src/user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 @Module({
   imports: [UserModule, JwtModule.register({

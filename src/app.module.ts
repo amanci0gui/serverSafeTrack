@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -9,7 +10,9 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 
 @Module({
-  imports: [PrismaModule, UserModule, AuthModule],
+  imports: [ConfigModule.forRoot({
+    isGlobal: true, // deixa acessível em toda a aplication
+  }), PrismaModule, UserModule, AuthModule],
   controllers: [AppController],
   providers: [AppService, 
     {
