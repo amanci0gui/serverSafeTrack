@@ -18,6 +18,15 @@ enum Role {
   ADMIN
 }
 
+enum CrimeType {
+  ROUBO
+  FURTO
+  HOMICIDIO
+  FEMINICIDIO
+  VANDALISMO
+  OUTRO   
+}
+
 model User {
   id Int @id @default(autoincrement())
 
@@ -26,4 +35,27 @@ model User {
   name     String
   active   Boolean @default(true)
   role     Role    @default(USER)
+
+  //relacionamento
+  markers Marker[]
 }
+
+model Marker {
+  id String @id @default(uuid()) 
+
+  title String
+  description String 
+  type CrimeType
+  date DateTime
+  time DateTime 
+  latitude Float
+  longitude Float
+  createdAt DateTime @default(now())
+  active Boolean @default(true)
+  userId Int
+
+  //relacionamentos
+  user User @relation(fields: [userId], references: [id])
+
+}
+
