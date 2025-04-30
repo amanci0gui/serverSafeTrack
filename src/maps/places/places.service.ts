@@ -6,16 +6,17 @@ import { ConfigService } from '@nestjs/config';
 export class PlacesService {    
     constructor(
         private configService: ConfigService,
-        private googleMapsCliente: GoogleMapsClient,
+        private googleMapsClient: GoogleMapsClient,
     ) {}
 
 
     async findPlace(text: string) {
-        const {data} = await this.googleMapsCliente.findPlaceFromText({
+
+        const {data} = await this.googleMapsClient.findPlaceFromText({
             params: {
                 input: text,
                 inputtype: PlaceInputType.textQuery,
-                fields: ['formatted_adress', 'geometry', 'name', 'place_id '],
+                fields: ['formatted_adress', 'geometry', 'name', 'place_id'],
                 key: this.configService.get('GOOGLE_MAPS_API_KEY')!,
             },
         });
