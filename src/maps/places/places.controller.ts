@@ -1,6 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { PlacesService } from './places.service';
 import { Roles } from 'src/auth/decorators/roles.decorators';
+import { IsPublic } from 'src/auth/decorators/is-public.decorator';
 
 @Controller('places')
 export class PlacesController {
