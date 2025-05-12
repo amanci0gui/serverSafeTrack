@@ -45,7 +45,7 @@ model Marker {
 
   title String
   description String 
-  type CrimeType
+  category CrimeType
   date DateTime
   time DateTime 
   latitude Float
