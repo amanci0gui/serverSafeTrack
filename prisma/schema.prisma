@@ -47,7 +47,7 @@ model Marker {
   description String 
   category CrimeType
   date DateTime
-  time DateTime 
+  time DateTime //ainda em dúvida sobre tipagem desse campo
   latitude Float
   longitude Float
   createdAt DateTime @default(now())
