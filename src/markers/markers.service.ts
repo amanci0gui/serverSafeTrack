@@ -1,11 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMarkerDto } from './dto/create-marker.dto';
 import { UpdateMarkerDto } from './dto/update-marker.dto';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { User } from 'generated/prisma';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class MarkersService {
-  create(createMarkerDto: CreateMarkerDto) {
-    return 'This action adds a new marker';
+
+  constructor(private readonly prisma: PrismaService){}
+
+  async create(createMarkerDto: CreateMarkerDto, user: User) {
+    const userId = user.id
+
+    const data = {
+      ...createMarkerDto,
+      userId: userId
+    }
+
+    const createdMarker = await this.prisma.marker.create({ data });
+
+
+    return createdMarker;
   }
 
   findAll() {

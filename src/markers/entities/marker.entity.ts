@@ -11,6 +11,6 @@ export class Marker {
     longitude: number;
     createdAt: Date;
     active: boolean;
-    user: User;
+    userId: number;
 } 
 

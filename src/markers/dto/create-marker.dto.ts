@@ -1,4 +1,5 @@
 import { CrimeType } from "@prisma/client";
+import { Type } from "class-transformer";
 import { IsDate, IsEnum, IsNumber, IsString, MaxLength } from "class-validator";
 
 
@@ -14,9 +15,8 @@ export class CreateMarkerDto {
     category: CrimeType;
 
     @IsDate()
-    date: Date;
-
-    time: Date;
+    @Type(() => Date)
+    dateTime: Date;
 
     @IsNumber()
     latitude: number;

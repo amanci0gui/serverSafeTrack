@@ -2,14 +2,18 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { MarkersService } from './markers.service';
 import { CreateMarkerDto } from './dto/create-marker.dto';
 import { UpdateMarkerDto } from './dto/update-marker.dto';
+import { User } from 'generated/prisma';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { Roles } from 'src/auth/decorators/roles.decorators';
 
 @Controller('markers')
 export class MarkersController {
   constructor(private readonly markersService: MarkersService) {}
 
   @Post()
-  create(@Body() createMarkerDto: CreateMarkerDto) {
-    return this.markersService.create(createMarkerDto);
+  @Roles("USER")
+  create(@Body() createMarkerDto: CreateMarkerDto, @CurrentUser() user: User) {
+    return this.markersService.create(createMarkerDto, user);
   }
 
   @Get()
