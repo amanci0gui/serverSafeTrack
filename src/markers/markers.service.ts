@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMarkerDto } from './dto/create-marker.dto';
 import { UpdateMarkerDto } from './dto/update-marker.dto';
 import { User } from 'generated/prisma';
@@ -29,8 +29,19 @@ export class MarkersService {
     return markers;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} marker`;
+  async findOne(id: string) {
+
+    const marker = await this.prisma.marker.findUnique({ // Fetch a single marker by its ID
+      where: {
+        id: id
+      }
+    })
+
+    if (!marker) {
+      throw new NotFoundException(`Marcador com id ${id} não encontrado`); // Throw an exception if the marker is not found
+    } 
+
+    return marker;
   }
 
   update(id: number, updateMarkerDto: UpdateMarkerDto) {

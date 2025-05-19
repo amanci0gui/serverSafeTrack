@@ -26,7 +26,7 @@ export class MarkersController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.markersService.findOne(+id);
+    return this.markersService.findOne(id);
   }
 
   @Patch(':id')
