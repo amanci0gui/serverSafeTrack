@@ -12,11 +12,14 @@ export class MarkersController {
 
   @Post()
   @Roles("USER")
+  @Roles("ADMIN")
   create(@Body() createMarkerDto: CreateMarkerDto, @CurrentUser() user: User) {
     return this.markersService.create(createMarkerDto, user);
   }
 
   @Get()
+  @Roles("USER")
+  @Roles("ADMIN") 
   findAll() {
     return this.markersService.findAll();
   }

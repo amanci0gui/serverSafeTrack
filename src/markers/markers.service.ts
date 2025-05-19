@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMarkerDto } from './dto/create-marker.dto';
 import { UpdateMarkerDto } from './dto/update-marker.dto';
-import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { User } from 'generated/prisma';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -24,8 +23,10 @@ export class MarkersService {
     return createdMarker;
   }
 
-  findAll() {
-    return `This action returns all markers`;
+  async findAll() {
+    const markers = await this.prisma.marker.findMany(); // Fetch all markers from the database
+
+    return markers;
   }
 
   findOne(id: number) {
