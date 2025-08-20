@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { MarkersService } from './markers.service';
 import { CreateMarkerDto } from './dto/create-marker.dto';
-import { UpdateMarkerDto } from './dto/update-marker.dto';
 import { User } from 'generated/prisma';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { Roles } from 'src/auth/decorators/roles.decorators';
@@ -29,13 +28,9 @@ export class MarkersController {
     return this.markersService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMarkerDto: UpdateMarkerDto) {
-    return this.markersService.update(+id, updateMarkerDto);
-  }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.markersService.remove(+id);
+    return this.markersService.remove(id);
   }
 }
