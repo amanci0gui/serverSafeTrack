@@ -1,53 +1,96 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { CreateMarkerDto } from './dto/create-marker.dto';
-import { User } from 'generated/prisma';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class MarkersService {
-
-  constructor(private readonly prisma: PrismaService){}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(createMarkerDto: CreateMarkerDto, user: User) {
-    const userId = user.id
+    const existingMarker = await this.prisma.marker.findFirst({
+      where: {
+        latitude: createMarkerDto.latitude,
+        longitude: createMarkerDto.longitude,
+        title: createMarkerDto.title,
+        category: createMarkerDto.category,
+      },
+    });
+
+    if (existingMarker) {
+      throw new ForbiddenException(
+        `Uma ocorrência com as mesmas descrições já foi criada!`,
+      );
+    }
+
+    const userId = user.id;
 
     const data = {
       ...createMarkerDto,
-      userId: userId
-    }
+      userId: userId,
+    };
 
     const createdMarker = await this.prisma.marker.create({ data });
-
 
     return createdMarker;
   }
 
   async findAll() {
-    const markers = await this.prisma.marker.findMany(); // Fetch all markers from the database
+    const today = new Date(); //pega data atual
+
+    const threeMonths = new Date();
+    threeMonths.setMonth(threeMonths.getMonth() - 3); //pega data de três meses atrás
+
+    const markers = await this.prisma.marker.findMany({ 
+      where:
+       {
+         active: true,
+        createdAt: { //filtra as ocorrências para pegar até os últimos três meses
+          gte: threeMonths,
+          lte: today,
+        }
+       } }); // Fetch all markers from the database
 
     return markers;
   }
 
   async findOne(id: string) {
-
-    const marker = await this.prisma.marker.findUnique({ // Fetch a single marker by its ID
+    const marker = await this.prisma.marker.findUnique({
+      // Fetch a single marker by its ID
       where: {
-        id: id
-      }
-    })
+        id: id,
+      },
+    });
 
     if (!marker) {
       throw new NotFoundException(`Marcador com id ${id} não encontrado`); // Throw an exception if the marker is not found
-    } 
+    }
 
     return marker;
   }
 
-  remove(id: string) {
-    return this.prisma.marker.delete({
-      where: {
-        id: id
-      }
+  async remove(id: string, user: User) {
+    const marker = await this.findOne(id);
+
+    if (!marker || marker.active === false) {
+      throw new NotFoundException(
+        `Marcador com id ${id} já foi removido ou não existe`,
+      ); //lança uma exceção se o marcador foi removido ou não existe
+    }
+
+    if (marker.userId !== user.id && user.role !== 'ADMIN') {
+      throw new ForbiddenException(
+        `Você não tem permissão para remover este marcador, pois não foi você quem o criou`,
+      ); //lança uma exception se não for o dono quem está excluindo
+    }
+
+    return this.prisma.marker.update({
+      where: { id },
+      data: { active: false }, //faz soft delete no marcador
     });
   }
 }

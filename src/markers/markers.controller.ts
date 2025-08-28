@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode } from '@nestjs/common';
 import { MarkersService } from './markers.service';
 import { CreateMarkerDto } from './dto/create-marker.dto';
-import { User } from 'generated/prisma';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { Roles } from 'src/auth/decorators/roles.decorators';
+import { User } from '@prisma/client';
 
 @Controller('markers')
 export class MarkersController {
@@ -17,8 +17,6 @@ export class MarkersController {
   }
 
   @Get()
-  @Roles("USER")
-  @Roles("ADMIN") 
   findAll() {
     return this.markersService.findAll();
   }
@@ -28,9 +26,11 @@ export class MarkersController {
     return this.markersService.findOne(id);
   }
 
-
+  @Roles("USER")
+  @Roles("ADMIN")
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.markersService.remove(id);
+  @HttpCode(204)
+  remove(@Param('id') id: string, @CurrentUser() user: User) {
+    return this.markersService.remove(id, user);
   }
 }
