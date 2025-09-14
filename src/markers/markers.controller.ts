@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpCode,
+} from '@nestjs/common';
 import { MarkersService } from './markers.service';
 import { CreateMarkerDto } from './dto/create-marker.dto';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
@@ -10,8 +19,8 @@ export class MarkersController {
   constructor(private readonly markersService: MarkersService) {}
 
   @Post()
-  @Roles("USER")
-  @Roles("ADMIN")
+  @Roles('USER')
+  @Roles('ADMIN')
   create(@Body() createMarkerDto: CreateMarkerDto, @CurrentUser() user: User) {
     return this.markersService.create(createMarkerDto, user);
   }
@@ -26,8 +35,13 @@ export class MarkersController {
     return this.markersService.findOne(id);
   }
 
-  @Roles("USER")
-  @Roles("ADMIN")
+  @Get(':userId')
+  findByUser(@Param('userId') userId: number) {
+    return this.markersService.findByUser(userId);
+  }
+
+  @Roles('USER')
+  @Roles('ADMIN')
   @Delete(':id')
   @HttpCode(204)
   remove(@Param('id') id: string, @CurrentUser() user: User) {

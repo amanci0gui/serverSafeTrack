@@ -9,6 +9,8 @@ import { User } from '@prisma/client';
 
 @Injectable()
 export class MarkersService {
+  
+  
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createMarkerDto: CreateMarkerDto, user: User) {
@@ -91,6 +93,15 @@ export class MarkersService {
     return this.prisma.marker.update({
       where: { id },
       data: { active: false }, //faz soft delete no marcador
+    });
+  }
+
+  findByUser(userId: number) {
+    return this.prisma.marker.findMany({
+      where: {
+        userId: userId,
+        active: true,
+      },
     });
   }
 }
