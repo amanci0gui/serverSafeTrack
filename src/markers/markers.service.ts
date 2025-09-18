@@ -6,14 +6,25 @@ import {
 import { CreateMarkerDto } from './dto/create-marker.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
+import { GeoService } from 'src/geo/geo.service';
 
 @Injectable()
 export class MarkersService {
   
   
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService, private readonly geoService: GeoService) {}
+
 
   async create(createMarkerDto: CreateMarkerDto, user: User) {
+
+    const canCreateMarker = this.geoService.isInside(createMarkerDto.longitude, createMarkerDto.latitude);
+
+    if (!canCreateMarker) {
+      throw new ForbiddenException(
+        `Você não pode criar um marcador fora da região ABC!`,
+      );
+    }
+
     const existingMarker = await this.prisma.marker.findFirst({
       where: {
         latitude: createMarkerDto.latitude,
@@ -96,8 +107,8 @@ export class MarkersService {
     });
   }
 
-  findByUser(userId: number) {
-    return this.prisma.marker.findMany({
+  async findByUser(userId: number) {
+    return await this.prisma.marker.findMany({
       where: {
         userId: userId,
         active: true,
