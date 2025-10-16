@@ -16,6 +16,7 @@ datasource db {
 enum Role {
   USER
   ADMIN
+  REPRESENTANTE
 }
 
 enum CrimeType {
@@ -24,37 +25,55 @@ enum CrimeType {
   HOMICIDIO
   FEMINICIDIO
   VANDALISMO
-  OUTRO   
+  OUTRO
 }
 
 model User {
-  id Int @id @default(autoincrement())
-
+  id       Int     @id @default(autoincrement())
   email    String  @unique
   password String
   name     String
-  active   Boolean @default(true)
   role     Role    @default(USER)
+  active   Boolean @default(true)
 
-  //relacionamento
-  markers Marker[]
+  // relação N:N com bairros
+  bairros Bairro[] @relation("UsuariosPorBairro")
+
+  // relação 1:1 como admin (um admin só pode ter um bairro)
+  adminBairro Bairro? @relation("AdminDoBairro")
+
+  marker Marker[]
+}
+
+model Bairro {
+  id      Int    @id @default(autoincrement())
+  name    String
+  cidade  String
+  polygon Json?
+
+  // N:N com usuários
+  usuarios User[] @relation("UsuariosPorBairro")
+
+  // 1:1 com admin
+  adminId Int?  @unique
+  admin   User? @relation("AdminDoBairro", fields: [adminId], references: [id])
+
+  @@unique([name, cidade])
 }
 
 model Marker {
-  id String @id @default(uuid()) 
+  id String @id @default(uuid())
 
-  title String
-  description String 
-  category CrimeType
-  dateTime DateTime 
-  latitude Float
-  longitude Float
-  createdAt DateTime @default(now())
-  active Boolean @default(true)
-  userId Int
+  title       String
+  description String
+  category    CrimeType
+  dateTime    DateTime
+  latitude    Float
+  longitude   Float
+  createdAt   DateTime  @default(now())
+  active      Boolean   @default(true)
+  userId      Int
 
   //relacionamentos
   user User @relation(fields: [userId], references: [id])
-
 }
-
