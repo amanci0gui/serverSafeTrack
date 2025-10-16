@@ -28,10 +28,22 @@ export class UserService {
   }
 
 
-  findByEmail(email: string) {
+  async findByEmail(email: string) {
     return this.prisma.user.findUnique({
       where: { email },
     })
   }
 
+  async activateOrDeactivate(id: number) {
+
+  const user = await this.prisma.user.findUnique({ where: { id } });
+  if (!user) throw new Error('Usuário não encontrado');
+
+  return this.prisma.user.update({
+    where: { id },
+    data: { active: !user.active },
+  });
+
+  
+}
 }
