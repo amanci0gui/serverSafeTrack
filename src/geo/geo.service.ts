@@ -1,60 +1,53 @@
+import { PrismaClient } from '@prisma/client';
 import * as turf from '@turf/turf';
-import { FeatureCollection, Polygon, MultiPolygon} from 'geojson';
-import * as fs from 'fs';
+
+const prisma = new PrismaClient();
 
 export class GeoService {
-    private polygons: number[][][][]; //lista de coordenadas dos poligonos
+  // 🔹 Verifica se um ponto está dentro do bairro informado usando Turf.js
+  async isInsideBairro(
+    longitude: number,
+    latitude: number,
+    cidade: string,
+    bairro: string
+  ): Promise<boolean> {
 
-    constructor() {
-        const geojson: FeatureCollection<Polygon | MultiPolygon> = JSON.parse(
-            fs.readFileSync('src/geo/regiaoABC.geojson', 'utf8'),
-        )
+    // Busca o registro específico no banco
+    const regiao = await prisma.bairro.findFirst({
+    where: { cidade, name: bairro },
+    select: { polygon: true }
+    });
 
-        this.polygons = geojson.features.map((feature) => {
-            if (feature.geometry.type === 'Polygon') {
-                return [feature.geometry.coordinates[0]];
-            }
-
-            if (feature.geometry.type === 'MultiPolygon') {
-                return feature.geometry.coordinates.map((poly) => poly[0]);
-            }
-
-            return [];
-
-        })
+    if (!regiao) {
+    console.warn('Bairro não encontrado no banco.');
+    return false;
     }
 
-    isInside(longitude: number, latitude: number): boolean {
-        return this.polygons.some((polygon) =>
-            polygon.some((ring) =>
-                pointInPolygon([longitude, latitude], ring as [number, number][])
-            )
-        );
+    // 🔹 Log para conferir o que veio do banco
+    console.log('GeoJSON do bairro:', regiao.polygon);
+
+    // Aqui assumimos que o polygon já é um objeto JSON válido
+    const geojson = regiao.polygon as any;
+
+    // Cria o ponto
+    const point = turf.point([longitude, latitude]);
+
+    const geometry = geojson.type === 'Feature' ? geojson.geometry : geojson;
+
+    let polygon;
+    if (geometry.type === 'Polygon') {
+    polygon = turf.polygon(geometry.coordinates);
+    } else if (geometry.type === 'MultiPolygon') {
+    polygon = turf.multiPolygon(geometry.coordinates);
+    } else {
+    console.warn('GeoJSON inválido');
+    return false;
     }
 
-}
+    // Verifica se o ponto está dentro
+    const inside = turf.booleanPointInPolygon(point, polygon);
+    console.log('Ponto dentro do bairro?', inside);
 
-
-//algoritmo que verifica se o ponto está dentro do polígono
-function pointInPolygon(point: [number, number], vs: [number, number][]): boolean {
-  const [x, y] = point;
-  let inside = false;
-
-  //para cada vértice do polígono
-  for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-
-    //coordenadas do vértice atual
-    const xi = vs[i][0], yi = vs[i][1];
-
-    //coordenadas do vértice anterior
-    const xj = vs[j][0], yj = vs[j][1];
-
-    //verifica se o ponto está dentro do polígono
-    const intersect =
-      yi > y !== yj > y &&
-      x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
-
-    if (intersect) inside = !inside;
+    return inside;
   }
-  return inside;
 }

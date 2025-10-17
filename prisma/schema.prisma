@@ -73,6 +73,8 @@ model Marker {
   createdAt   DateTime  @default(now())
   active      Boolean   @default(true)
   userId      Int
+  bairro      String
+  cidade      String
 
   //relacionamentos
   user User @relation(fields: [userId], references: [id])

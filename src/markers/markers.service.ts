@@ -17,7 +17,7 @@ export class MarkersService {
 
   async create(createMarkerDto: CreateMarkerDto, user: User) {
 
-    const canCreateMarker = this.geoService.isInside(createMarkerDto.longitude, createMarkerDto.latitude);
+    const canCreateMarker = await this.geoService.isInsideBairro(createMarkerDto.longitude, createMarkerDto.latitude, createMarkerDto.cidade, createMarkerDto.bairro);
 
     if (!canCreateMarker) {
       throw new ForbiddenException(
