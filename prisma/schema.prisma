@@ -39,7 +39,7 @@ model User {
   // relação N:N com bairros
   bairros Bairro[] @relation("UsuariosPorBairro")
 
-  // relação 1:1 como admin (um admin só pode ter um bairro)
+  // relação 1:1 como representante (um representante só pode ter um bairro)
   adminBairro Bairro? @relation("AdminDoBairro")
 
   marker Marker[]
