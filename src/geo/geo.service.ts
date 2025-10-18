@@ -24,7 +24,6 @@ export class GeoService {
     }
 
     // 🔹 Log para conferir o que veio do banco
-    console.log('GeoJSON do bairro:', regiao.polygon);
 
     // Aqui assumimos que o polygon já é um objeto JSON válido
     const geojson = regiao.polygon as any;
@@ -36,7 +35,7 @@ export class GeoService {
 
     let polygon;
     if (geometry.type === 'Polygon') {
-    polygon = turf.polygon(geometry.coordinates);
+    polygon = turf.polygon(geometry.coordinates); 
     } else if (geometry.type === 'MultiPolygon') {
     polygon = turf.multiPolygon(geometry.coordinates);
     } else {
@@ -46,7 +45,6 @@ export class GeoService {
 
     // Verifica se o ponto está dentro
     const inside = turf.booleanPointInPolygon(point, polygon);
-    console.log('Ponto dentro do bairro?', inside);
 
     return inside;
   }
