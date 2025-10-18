@@ -1,10 +1,12 @@
 import { PrismaClient } from '@prisma/client';
+import { JsonValue } from '@prisma/client/runtime/library';
 import * as turf from '@turf/turf';
+import { Polygon } from 'geojson';
 
 const prisma = new PrismaClient();
 
 export class GeoService {
-  // 🔹 Verifica se um ponto está dentro do bairro informado usando Turf.js
+  // Verifica se um ponto está dentro do bairro informado usando Turf.js
   async isInsideBairro(
     longitude: number,
     latitude: number,
@@ -23,12 +25,11 @@ export class GeoService {
     return false;
     }
 
-    // 🔹 Log para conferir o que veio do banco
 
     // Aqui assumimos que o polygon já é um objeto JSON válido
     const geojson = regiao.polygon as any;
 
-    // Cria o ponto
+    // Cria o ponto para verificação 
     const point = turf.point([longitude, latitude]);
 
     const geometry = geojson.type === 'Feature' ? geojson.geometry : geojson;
