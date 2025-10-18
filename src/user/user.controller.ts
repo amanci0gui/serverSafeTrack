@@ -2,6 +2,10 @@ import { Body, Controller, Param, Post, Put } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from './user.service';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
+import { Role, User } from '@prisma/client';
+import { Roles } from 'src/auth/decorators/roles.decorators';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { IsOptional } from 'class-validator';
 
 @Controller('user')
 export class UserController {
@@ -14,7 +18,17 @@ export class UserController {
   }
 
   @Put(':userId/activate-deactivate')
-  activateOrDeactivate(@Param('userId') id: number) {
-    return this.userService.activateOrDeactivate(id);
+  activateOrDeactivate(@Param('userId') id: number, @CurrentUser() user: User) {
+    return this.userService.activateOrDeactivate(id, user);
   }
+
+  @Roles('ADMIN')
+  @Put(':userId/change-role')
+  changeRole(
+    @Param('userId') id: number, 
+    @Body('role') role: Role,
+    @Body('bairroId') bairroId?: number) {
+    return this.userService.changeRole(id, role, bairroId ? bairroId : undefined);
+  }
+
 }
