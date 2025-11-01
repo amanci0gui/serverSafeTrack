@@ -7,4 +7,5 @@ export class User {
   name: string;
   active: boolean;
   role: Role;
+  bairroId?: number;
 }
