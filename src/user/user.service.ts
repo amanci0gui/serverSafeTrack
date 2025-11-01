@@ -61,6 +61,13 @@ export class UserService {
     });
     }
 
+    return this.addsRoleRepresentanteAndBairroToUser(user, bairroId!);
+  }
+
+   async addsRoleRepresentanteAndBairroToUser(user: User, bairroId: number) {
+    const id = user.id;
+    const role = user.role
+
     //se for representante, precisa setar o bairroId
     if (!bairroId) {
       throw new ForbiddenException('Para alterar o papel do usuário para REPRESENTANTE, é necessário fornecer o bairroId correspondente.');
@@ -108,8 +115,8 @@ export class UserService {
         name: updatedBairro.name,
         adminId: updatedBairro.adminId,
       },
-    };
-
-    
+    }
   }
 }
+
+
