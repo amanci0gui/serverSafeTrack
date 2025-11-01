@@ -10,12 +10,11 @@ export class GeoService {
   async isInsideBairro(
     longitude: number,
     latitude: number,
-    cidade: string,
-    bairro: string,
+    bairroId: number
   ): Promise<boolean> {
     // Busca o registro específico no banco
     const regiao = await prisma.bairro.findFirst({
-      where: { cidade, name: bairro },
+      where: { id: bairroId },
       select: { polygon: true },
     });
 

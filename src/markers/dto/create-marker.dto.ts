@@ -26,9 +26,6 @@ export class CreateMarkerDto {
   @IsNumber()
   userId: number;
 
-  @IsString()
-  cidade: string;
-
-  @IsString()
-  bairro: string;
+  @IsNumber()
+  bairroId: number;
 }

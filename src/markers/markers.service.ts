@@ -19,8 +19,7 @@ export class MarkersService {
     const canCreateMarker = await this.geoService.isInsideBairro(
       createMarkerDto.longitude,
       createMarkerDto.latitude,
-      createMarkerDto.cidade,
-      createMarkerDto.bairro,
+      createMarkerDto.bairroId,
     );
 
     if (!canCreateMarker) {
