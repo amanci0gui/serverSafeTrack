@@ -43,6 +43,12 @@ model User {
   adminBairro Bairro? @relation("AdminDoBairro")
 
   marker Marker[]
+
+  // pedidos feitos (como morador)
+  pedidosFeitos Pedido[] @relation("PedidosFeitos")
+
+  // pedidos recebidos (como representante)
+  pedidosRecebidos Pedido[] @relation("PedidosRecebidos")
 }
 
 model Bairro {
@@ -55,8 +61,9 @@ model Bairro {
   usuarios User[] @relation("UsuariosPorBairro")
 
   // 1:1 com admin
-  adminId Int?  @unique
-  admin   User? @relation("AdminDoBairro", fields: [adminId], references: [id])
+  adminId Int?     @unique
+  admin   User?    @relation("AdminDoBairro", fields: [adminId], references: [id])
+  Pedido  Pedido[]
 
   @@unique([name, cidade])
 }
@@ -78,4 +85,28 @@ model Marker {
 
   //relacionamentos
   user User @relation(fields: [userId], references: [id])
+}
+
+enum PedidoStatus {
+  PENDENTE
+  APROVADO
+  REPROVADO
+}
+
+model Pedido {
+  id        Int          @id @default(autoincrement())
+  titulo    String
+  descricao String
+  status    PedidoStatus @default(PENDENTE)
+  criadoEm  DateTime     @default(now())
+
+  // relações
+  bairroId Int
+  bairro   Bairro @relation(fields: [bairroId], references: [id])
+
+  moradorId Int
+  morador   User @relation("PedidosFeitos", fields: [moradorId], references: [id])
+
+  representanteId Int
+  representante   User @relation("PedidosRecebidos", fields: [representanteId], references: [id])
 }
