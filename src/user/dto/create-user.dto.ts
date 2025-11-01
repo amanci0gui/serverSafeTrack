@@ -3,6 +3,7 @@ import { User } from '../entities/user.entity';
 import {
   IsEmail,
   IsEnum,
+  IsInt,
   IsOptional,
   IsString,
   Matches,
@@ -28,4 +29,8 @@ export class CreateUserDto {
   @IsOptional()
   @IsEnum(Role)
   role?: Role;
+
+  @IsOptional()
+  @IsInt()
+  bairroId? : number;
 }

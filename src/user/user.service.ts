@@ -14,10 +14,34 @@ import { Role, User } from '@prisma/client';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto, user: User) {
+    //verifica se o usuário que está criando o novo usuário é admin ou representante
+    if (user.role !== 'ADMIN' && user.role !== 'REPRESENTANTE') {
+      throw new UnauthorizedException('Apenas administradores e representantes podem criar usuários.');
+    }
+
+    const userExists = await this.prisma.user.findUnique({
+      where: { email: createUserDto.email },
+    })
+
+    if (userExists) throw new ForbiddenException('Já existe um usuário cadastrado com esse e-mail.');
+
+    if (createUserDto.role === 'ADMIN' && user.role !== 'ADMIN') {
+      throw new ForbiddenException('Apenas administradores podem criar administradores.');
+    }
+
+    if (createUserDto.role === 'USER' && !createUserDto.bairroId) {
+      throw new ForbiddenException('Para criar um usuário comum, é necessário associá-lo a um bairro.');
+    }
+
+    const bairroDoRepresentante = await this.prisma.bairro.findUnique({
+      where: { adminId: user.id },
+    });
+
     //TODO: encrypt password
     const data = {
       ...createUserDto,
+      bairroId: bairroDoRepresentante?.id,
       password: await bcrypt.hash(createUserDto.password, 1),
     };
 

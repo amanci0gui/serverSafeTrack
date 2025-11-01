@@ -11,10 +11,9 @@ import { IsOptional } from 'class-validator';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @IsPublic() //tornar essa rota pública (sem autenticação)
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  create(@Body() createUserDto: CreateUserDto, @CurrentUser() user: User) {
+    return this.userService.create(createUserDto, user);
   }
 
   @Put(':userId/activate-deactivate')
