@@ -10,14 +10,18 @@ import { GeoService } from 'src/geo/geo.service';
 
 @Injectable()
 export class MarkersService {
-  
-  
-  constructor(private readonly prisma: PrismaService, private readonly geoService: GeoService) {}
-
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly geoService: GeoService,
+  ) {}
 
   async create(createMarkerDto: CreateMarkerDto, user: User) {
-
-    const canCreateMarker = await this.geoService.isInsideBairro(createMarkerDto.longitude, createMarkerDto.latitude, createMarkerDto.cidade, createMarkerDto.bairro);
+    const canCreateMarker = await this.geoService.isInsideBairro(
+      createMarkerDto.longitude,
+      createMarkerDto.latitude,
+      createMarkerDto.cidade,
+      createMarkerDto.bairro,
+    );
 
     if (!canCreateMarker) {
       throw new ForbiddenException(
@@ -58,15 +62,16 @@ export class MarkersService {
     const threeMonths = new Date();
     threeMonths.setMonth(threeMonths.getMonth() - 3); //pega data de três meses atrás
 
-    const markers = await this.prisma.marker.findMany({ 
-      where:
-       {
-         active: true,
-        createdAt: { //filtra as ocorrências para pegar até os últimos três meses
+    const markers = await this.prisma.marker.findMany({
+      where: {
+        active: true,
+        createdAt: {
+          //filtra as ocorrências para pegar até os últimos três meses
           gte: threeMonths,
           lte: today,
-        }
-       } }); // Fetch all markers from the database
+        },
+      },
+    }); // Fetch all markers from the database
 
     return markers;
   }

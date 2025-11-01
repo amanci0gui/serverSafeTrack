@@ -1,35 +1,34 @@
-import { CrimeType } from "@prisma/client";
-import { Type } from "class-transformer";
-import { IsDate, IsEnum, IsNumber, IsString, MaxLength } from "class-validator";
-
+import { CrimeType } from '@prisma/client';
+import { Type } from 'class-transformer';
+import { IsDate, IsEnum, IsNumber, IsString, MaxLength } from 'class-validator';
 
 export class CreateMarkerDto {
-    @IsString()
-    title: string;
+  @IsString()
+  title: string;
 
-    @IsString()
-    @MaxLength(250)
-    description: string;
-    
-    @IsEnum(CrimeType)
-    category: CrimeType;
+  @IsString()
+  @MaxLength(250)
+  description: string;
 
-    @IsDate()
-    @Type(() => Date)
-    dateTime: Date;
+  @IsEnum(CrimeType)
+  category: CrimeType;
 
-    @IsNumber()
-    latitude: number;
+  @IsDate()
+  @Type(() => Date)
+  dateTime: Date;
 
-    @IsNumber()
-    longitude: number;
+  @IsNumber()
+  latitude: number;
 
-    @IsNumber()
-    userId: number;
+  @IsNumber()
+  longitude: number;
 
-    @IsString()
-    cidade: string; 
+  @IsNumber()
+  userId: number;
 
-    @IsString()
-    bairro: string;
+  @IsString()
+  cidade: string;
+
+  @IsString()
+  bairro: string;
 }

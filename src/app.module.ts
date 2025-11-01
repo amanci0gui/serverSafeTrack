@@ -12,19 +12,27 @@ import { MapsModule } from './maps/maps.module';
 import { MarkersModule } from './markers/markers.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({
-    isGlobal: true, // deixa acessível em toda a aplication
-  }), PrismaModule, UserModule, AuthModule, MapsModule, MarkersModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true, // deixa acessível em toda a aplication
+    }),
+    PrismaModule,
+    UserModule,
+    AuthModule,
+    MapsModule,
+    MarkersModule,
+  ],
   controllers: [AppController],
-  providers: [AppService, 
+  providers: [
+    AppService,
     {
-    provide: APP_GUARD,
-    useClass: JwtAuthGuard,
-  },
-  {
-    provide: APP_GUARD,
-    useClass: RolesGuard
-  }
-],
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}

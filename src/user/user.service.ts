@@ -1,76 +1,82 @@
-import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import * as bcrypt from 'bcrypt'
+import * as bcrypt from 'bcrypt';
 import { Role, User } from '@prisma/client';
 
 @Injectable()
 export class UserService {
-
-  constructor(private readonly prisma: PrismaService){}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
-
     //TODO: encrypt password
     const data = {
       ...createUserDto,
-      password: await bcrypt.hash(createUserDto.password, 1)
-    }
+      password: await bcrypt.hash(createUserDto.password, 1),
+    };
 
     //persiste o user criado no banco de dados
-    const createdUser = await this.prisma.user.create({ data })
-
+    const createdUser = await this.prisma.user.create({ data });
 
     return {
       ...createdUser,
-      password: undefined
+      password: undefined,
     };
   }
-
 
   async findByEmail(email: string) {
     return this.prisma.user.findUnique({
       where: { email },
-    })
+    });
   }
 
   async activateOrDeactivate(id: number, user: User) {
+    if (user.id !== id && user.role !== 'ADMIN')
+      throw new UnauthorizedException(
+        'Permissão negada, apennas administradores ou o próprio usuário podem ativar/desativar contas.',
+      );
 
-    if (user.id !== id && user.role !== 'ADMIN') throw new UnauthorizedException('Permissão negada, apennas administradores ou o próprio usuário podem ativar/desativar contas.');
-
-    const userToBeUpdated = await this.prisma.user.findUnique({ where: { id } });
+    const userToBeUpdated = await this.prisma.user.findUnique({
+      where: { id },
+    });
     if (!userToBeUpdated) throw new NotFoundException('Usuário não encontrado');
 
     return this.prisma.user.update({
       where: { id },
       data: { active: !userToBeUpdated.active },
     });
-}
+  }
 
   async changeRole(id: number, role: Role, bairroId?: number) {
-
     const user = await this.prisma.user.findUnique({ where: { id } });
 
     if (!user) throw new NotFoundException('Usuário não encontrado');
 
-    if (role !== 'REPRESENTANTE'){
+    if (role !== 'REPRESENTANTE') {
       return this.prisma.user.update({
         where: { id },
         data: { role },
-    });
+      });
     }
 
     return this.addsRoleRepresentanteAndBairroToUser(user, bairroId!);
   }
 
-   async addsRoleRepresentanteAndBairroToUser(user: User, bairroId: number) {
+  async addsRoleRepresentanteAndBairroToUser(user: User, bairroId: number) {
     const id = user.id;
-    const role = user.role
+    const role = user.role;
 
     //se for representante, precisa setar o bairroId
     if (!bairroId) {
-      throw new ForbiddenException('Para alterar o papel do usuário para REPRESENTANTE, é necessário fornecer o bairroId correspondente.');
+      throw new ForbiddenException(
+        'Para alterar o papel do usuário para REPRESENTANTE, é necessário fornecer o bairroId correspondente.',
+      );
     }
 
     //verifica se o bairro já tem um representante associado
@@ -80,7 +86,7 @@ export class UserService {
 
     if (!bairro) throw new NotFoundException('Bairro não encontrado.');
 
-    //verifica se o representante já está associado a outro bairro 
+    //verifica se o representante já está associado a outro bairro
     const representanteTemBairro = await this.prisma.bairro.findUnique({
       where: { adminId: id },
     });
@@ -88,7 +94,9 @@ export class UserService {
     const bairroTemRepresentante = !!bairro.adminId;
 
     if (representanteTemBairro || bairroTemRepresentante) {
-      throw new ForbiddenException('Usuário já é administrador de outro bairro ou o bairro já tem representante.');
+      throw new ForbiddenException(
+        'Usuário já é administrador de outro bairro ou o bairro já tem representante.',
+      );
     }
 
     // Realiza a transação para garantir a atomicidade das operações de atualização
@@ -115,8 +123,6 @@ export class UserService {
         name: updatedBairro.name,
         adminId: updatedBairro.adminId,
       },
-    }
+    };
   }
 }
-
-

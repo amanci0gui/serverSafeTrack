@@ -8,6 +8,6 @@ import { GeoService } from 'src/geo/geo.service';
   imports: [PrismaModule],
   controllers: [MarkersController],
   providers: [MarkersService, GeoService],
-  exports: [MarkersService]
+  exports: [MarkersService],
 })
 export class MarkersModule {}

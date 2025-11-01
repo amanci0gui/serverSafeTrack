@@ -25,10 +25,14 @@ export class UserController {
   @Roles('ADMIN')
   @Put(':userId/change-role')
   changeRole(
-    @Param('userId') id: number, 
+    @Param('userId') id: number,
     @Body('role') role: Role,
-    @Body('bairroId') bairroId?: number) {
-    return this.userService.changeRole(id, role, bairroId ? bairroId : undefined);
+    @Body('bairroId') bairroId?: number,
+  ) {
+    return this.userService.changeRole(
+      id,
+      role,
+      bairroId ? bairroId : undefined,
+    );
   }
-
 }

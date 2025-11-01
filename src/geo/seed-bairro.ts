@@ -5,7 +5,9 @@ const prisma = new PrismaClient();
 
 async function main() {
   // 1️⃣ Lê o arquivo GeoJSON
-  const data = JSON.parse(fs.readFileSync('src/geo/exportBairros.geojson', 'utf-8'));
+  const data = JSON.parse(
+    fs.readFileSync('src/geo/exportBairros.geojson', 'utf-8'),
+  );
 
   // 2️⃣ Itera pelas features e prepara os dados
   const bairrosData = data.features
@@ -44,5 +46,5 @@ async function main() {
 }
 
 main()
-  .catch(e => console.error(e))
+  .catch((e) => console.error(e))
   .finally(async () => await prisma.$disconnect());
