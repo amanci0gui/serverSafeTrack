@@ -10,6 +10,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { MapsModule } from './maps/maps.module';
 import { MarkersModule } from './markers/markers.module';
+import { PedidosModule } from './pedidos/pedidos.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { MarkersModule } from './markers/markers.module';
     AuthModule,
     MapsModule,
     MarkersModule,
+    PedidosModule,
   ],
   controllers: [AppController],
   providers: [
