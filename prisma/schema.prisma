@@ -36,8 +36,9 @@ model User {
   role     Role    @default(USER)
   active   Boolean @default(true)
 
-  // relação N:N com bairros
-  bairros Bairro[] @relation("UsuariosPorBairro")
+  // cada usuário (morador) pertence a um único bairro
+  bairroId Int?
+  bairro   Bairro? @relation("UsuariosPorBairro", fields: [bairroId], references: [id])
 
   // relação 1:1 como representante (um representante só pode ter um bairro)
   adminBairro Bairro? @relation("AdminDoBairro")
@@ -51,12 +52,14 @@ model Bairro {
   cidade  String
   polygon Json?
 
-  // N:N com usuários
+  // 1:N com usuários (moradores)
   usuarios User[] @relation("UsuariosPorBairro")
 
   // 1:1 com admin
   adminId Int?  @unique
   admin   User? @relation("AdminDoBairro", fields: [adminId], references: [id])
+
+  markers Marker[]
 
   @@unique([name, cidade])
 }
@@ -73,8 +76,10 @@ model Marker {
   createdAt   DateTime  @default(now())
   active      Boolean   @default(true)
   userId      Int
-  bairro      String
-  cidade      String
+
+  // substituído: usa FK para Bairro para permitir join e obter nome/cidade via relação
+  bairroId Int
+  bairro   Bairro @relation(fields: [bairroId], references: [id])
 
   //relacionamentos
   user User @relation(fields: [userId], references: [id])
