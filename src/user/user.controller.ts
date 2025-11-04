@@ -11,9 +11,22 @@ import { IsOptional } from 'class-validator';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto, @CurrentUser() user: User) {
-    return this.userService.create(createUserDto, user);
+  @Roles('ADMIN')
+  @Post('representante')
+  createRepresentante(
+    @Body() createUserDto: CreateUserDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.userService.createRepresentante(createUserDto, user);
+  }
+
+  @Roles('REPRESENTANTE')
+  @Post('morador')
+  createMorador(
+    @Body() createUserDto: CreateUserDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.userService.createMorador(createUserDto, user);
   }
 
   @Put(':userId/activate-deactivate')
