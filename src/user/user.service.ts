@@ -38,18 +38,21 @@ export class UserService {
       password: await bcrypt.hash(createUserDto.password, 1),
     };
 
-    const [updatedBairro, createdUser] = await this.prisma.$transaction([
-      this.prisma.bairro.update({
+    const result = await this.prisma.$transaction(async (prisma) => {
+      const createdUser = await prisma.user.create({ data });
+      
+      const updatedBairro = await prisma.bairro.update({
         where: { id: createUserDto.bairroId },
-        data: { adminId: user.id },
-      }),
-      this.prisma.user.create({ data }),
-    ]);
+        data: { adminId: createdUser.id },
+      });
+
+      return { createdUser, updatedBairro };
+    });
 
     return {
-      ...createdUser,
+      ...result.createdUser,
       password: undefined,
-      bairro: updatedBairro,
+      bairro: result.updatedBairro,
     };
   }
 
