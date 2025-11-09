@@ -58,7 +58,7 @@ export class UserService {
 
   async createMorador(createUserDto: CreateUserDto, user: User) {
     if (user.role !== 'REPRESENTANTE') {
-      throw new UnauthorizedException('Apenas administradores e representantes podem criar moradores.');
+      throw new UnauthorizedException('Apenas representantes podem criar moradores.');
     }
 
     const userExists = await this.prisma.user.findUnique({
@@ -67,14 +67,25 @@ export class UserService {
 
     if (userExists) throw new ForbiddenException('Já existe um usuário cadastrado com esse e-mail.');
 
+    // Busca o representante completo do banco para garantir que temos o bairroId
+    const representante = await this.prisma.user.findUnique({
+      where: { id: user.id },
+      select: { id: true, bairroId: true, role: true, active: true },
+    });
+
+    if (!representante?.bairroId) {
+      throw new ForbiddenException('O representante não está associado a nenhum bairro.');
+    }
+
     const bairroDoMorador = await this.prisma.bairro.findUnique({
-      where: { id: user.bairroId! },
+      where: { id: representante.bairroId },
     });
 
     if (!bairroDoMorador) throw new NotFoundException('Bairro não encontrado.');
 
     const data = {
       ...createUserDto,
+      bairroId: representante.bairroId, // Usa o bairroId do representante
       password: await bcrypt.hash(createUserDto.password, 1),
     };
 
