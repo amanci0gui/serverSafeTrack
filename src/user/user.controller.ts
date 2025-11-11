@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from './user.service';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
@@ -47,4 +47,11 @@ export class UserController {
       bairroId ? bairroId : undefined,
     );
   }
+
+  @Roles('REPRESENTANTE', 'ADMIN')
+  @Get()
+  findAll(@CurrentUser() user: User) {
+    return this.userService.findAll(user);
+  }
+
 }
