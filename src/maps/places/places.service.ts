@@ -23,4 +23,14 @@ export class PlacesService {
     });
     return data;
   }
+
+  async findCoordinates(latitude: number, longitude: number) {
+    const { data } = await this.googleMapsClient.reverseGeocode({
+      params: {
+        latlng: { lat: latitude, lng: longitude },
+        key: this.configService.get('GOOGLE_MAPS_API_KEY')!,
+      },
+    });
+    return data;
+  }
 }

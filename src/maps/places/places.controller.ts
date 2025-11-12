@@ -14,4 +14,10 @@ export class PlacesController {
   findPlace(@Query('text') text: string) {
     return this.placesService.findPlace(text);
   }
+
+  @Roles('USER', 'REPRESENTANTE', 'USER')
+  @Get('coordinates')
+  findCoordinates(@Query('latitude') latitude: number, @Query('longitude') longitude: number) {
+    return this.placesService.findCoordinates(latitude, longitude);
+  }
 }
