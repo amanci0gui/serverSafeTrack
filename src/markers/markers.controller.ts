@@ -19,8 +19,7 @@ export class MarkersController {
   constructor(private readonly markersService: MarkersService) {}
 
   @Post()
-  @Roles('USER')
-  @Roles('ADMIN')
+  @Roles('USER', 'REPRESENTANTE', 'ADMIN')
   create(@Body() createMarkerDto: CreateMarkerDto, @CurrentUser() user: User) {
     return this.markersService.create(createMarkerDto, user);
   }
