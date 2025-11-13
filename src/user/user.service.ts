@@ -5,7 +5,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { $Enums, Role, User } from '@prisma/client';
@@ -58,10 +57,22 @@ export class UserService {
     });
 
     return {
-      ...result.createdUser,
-      password: undefined,
-      bairro: result.updatedBairro,
-    };
+      message: 'Representante criado com sucesso',
+      user: {
+        id: result.createdUser.id,
+        name: result.createdUser.name,
+        email: result.createdUser.email,
+        role: result.createdUser.role,
+      },
+      bairro: {
+        id: result.updatedBairro.id,
+        name: result.updatedBairro.name,
+        cidade: result.updatedBairro.cidade,
+        adminId: result.updatedBairro.adminId,
+      }
+    }
+
+
   }
 
   async createMorador(createUserDto: CreateUserDto, user: User) {
@@ -85,11 +96,11 @@ export class UserService {
       throw new ForbiddenException('O representante não está associado a nenhum bairro.');
     }
 
-    const bairroDoMorador = await this.prisma.bairro.findUnique({
-      where: { id: representante.bairroId },
+    const updatedBairro = await this.prisma.bairro.findUnique({
+      where: { adminId: representante.id },
     });
 
-    if (!bairroDoMorador) throw new NotFoundException('Bairro não encontrado.');
+    if (!updatedBairro) throw new NotFoundException('Bairro não encontrado.');
 
     const data = {
       ...createUserDto,
@@ -99,11 +110,22 @@ export class UserService {
 
     const createdUser = await this.prisma.user.create({ data });
 
+
     return {
-      ...createdUser,
-      password: undefined,
-      bairro: bairroDoMorador,
-    };
+      message: 'Morador criado com sucesso',
+      user: {
+        id: createdUser.id,
+        name: createdUser.name,
+        email: createdUser.email,
+        role: createdUser.role,
+      },
+      bairro: {
+        id: updatedBairro.id,
+        name: updatedBairro.name,
+        cidade: updatedBairro.cidade,
+        adminId: updatedBairro.adminId,
+      }
+    }
   }
 
   async findByEmail(email: string) {
