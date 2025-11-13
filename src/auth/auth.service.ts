@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/entities/user.entity';
@@ -8,13 +8,17 @@ import { UserToken } from './models/UserToken';
 import { UnauthorizedError } from './errors/unauthorized.error';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
+  private resetCodes = new Map<string, { token: string; tokenExpiry: number }>();
+
   constructor(
     private readonly prismaService: PrismaService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly mailerService: MailerService,
   ) {}
 
   login(user: User): UserToken {
@@ -71,5 +75,54 @@ export class AuthService {
     });
 
     return { message: 'Senha alterada com sucesso' };
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.prismaService.user.findUnique({ where: { email } });
+    if (!user) return { message: 'Se o email existir, um token de reset será enviado.' };
+
+    const token = Math.floor(100000 + Math.random() * 900000).toString(); 
+    const tokenExpiry = Date.now() + 15 * 60 * 1000; // 15 minutos
+    this.resetCodes.set(email, { token, tokenExpiry });
+
+    //Aqui será colocado o serviço de envio de email
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'SafeTrack - Código de Redefinição de Senha',
+      template: 'reset-code', // nome do arquivo de template
+      context: {
+        name: user.name,
+        code: token,
+      },
+    })
+
+    return { message: 'Código enviado por email!' };
+  }
+
+  async verifyResetToken(email: string, token: string) {
+    const data = this.resetCodes.get(email);
+    if (!data || data.token !== token || Date.now() > data.tokenExpiry)
+          throw new BadRequestException('Código inválido ou expirado');
+
+    const tokenTemporario = this.jwtService.sign({ email });
+    return { token: tokenTemporario };
+  }
+
+  async resetPassword(email: string, token: string, newPassword: string) {
+    try {
+      const payload = this.jwtService.verify<{ email: string }>(token);
+      console.log('PAYLOAD:', payload);
+      if (payload.email !== email) throw new BadRequestException('Token inválido');
+    } catch {
+      throw new BadRequestException('Token inválido ou expirado');
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await this.prismaService.user.update({
+      where: { email },
+      data: { password: hashed },
+    });
+
+    return { message: 'Senha cadastrada com sucesso' };
   }
 }

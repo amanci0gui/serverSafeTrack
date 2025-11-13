@@ -26,10 +26,36 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
+  //Esse endpoint é para quando o usuário sabe a senha antiga e quer trocar
   @Patch('change-password')
   async changePassword(
     @Body() body: ChangePasswordDto,
   ) {
     return this.authService.changePassword(body);
   }
+
+  @IsPublic()
+  @Post('forgot-password')
+  async forgotPassword(@Body('email') email: string) {
+    return this.authService.forgotPassword(email);
+  }
+
+  @IsPublic()
+  @Post('verify-reset-token')
+  async verifyResetToken(@Body() body: { email: string; token: string }) {
+    return this.authService.verifyResetToken(body.email, body.token);
+  }
+
+  @IsPublic()
+  @Patch('reset-password')
+  async resetPassword(
+    @Body() body: { email: string; token: string; newPassword: string },
+  ) {
+    return this.authService.resetPassword(
+      body.email,
+      body.token,
+      body.newPassword,
+    );
+  }
+
 }
