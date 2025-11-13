@@ -7,6 +7,8 @@ import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
 export class LocalAuthGuard extends AuthGuard('local') {
+
+  //verifica se o user está autenticado
   canActivate(context: ExecutionContext) {
     return super.canActivate(context);
   }

@@ -6,10 +6,13 @@ import { UserPayload } from './models/UserPayload';
 import { JwtService } from '@nestjs/jwt';
 import { UserToken } from './models/UserToken';
 import { UnauthorizedError } from './errors/unauthorized.error';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly prismaService: PrismaService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
@@ -52,5 +55,21 @@ export class AuthService {
 
     //Se chegar aqui, não encontrou o user e/ou senha não corresponde
     throw new Error('Email adress or password provided is incorrect');
+  }
+
+  async changePassword(changePasswordDto: ChangePasswordDto) {
+    const user = await this.prismaService.user.findUnique({ where: { email: changePasswordDto.email } });
+    if (!user) throw new UnauthorizedError('Usuário não encontrado');
+  
+    const isMatch = await bcrypt.compare(changePasswordDto.oldPassword, user.password);
+    if (!isMatch) throw new UnauthorizedError('Senha antiga incorreta');
+
+    const hashedNewPassword = await bcrypt.hash(changePasswordDto.newPassword, 10);
+    await this.prismaService.user.update({
+      where: { email: changePasswordDto.email },
+      data: { password: hashedNewPassword },
+    });
+
+    return { message: 'Senha alterada com sucesso' };
   }
 }

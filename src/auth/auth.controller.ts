@@ -1,7 +1,9 @@
 import {
+  Body,
   Controller,
   HttpCode,
   HttpStatus,
+  Patch,
   Post,
   Request,
   UseGuards,
@@ -10,6 +12,7 @@ import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthRequest } from './models/AuthRequest';
 import { IsPublic } from './decorators/is-public.decorator';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Controller()
 export class AuthController {
@@ -21,5 +24,12 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   login(@Request() req: AuthRequest) {
     return this.authService.login(req.user);
+  }
+
+  @Patch('change-password')
+  async changePassword(
+    @Body() body: ChangePasswordDto,
+  ) {
+    return this.authService.changePassword(body);
   }
 }
