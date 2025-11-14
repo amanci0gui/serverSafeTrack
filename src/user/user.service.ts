@@ -137,7 +137,7 @@ export class UserService {
   async activateOrDeactivate(id: number, user: User) {
     if (user.id !== id && user.role !== 'ADMIN')
       throw new UnauthorizedException(
-        'Permissão negada, apennas administradores ou o próprio usuário podem ativar/desativar contas.',
+        'Permissão negada, apenas administradores ou o próprio usuário podem ativar/desativar contas.',
       );
 
     const userToBeUpdated = await this.prisma.user.findUnique({

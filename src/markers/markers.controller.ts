@@ -20,6 +20,7 @@ export class MarkersController {
 
   @Post()
   @Roles('USER', 'REPRESENTANTE', 'ADMIN')
+  @HttpCode(201)
   create(@Body() createMarkerDto: CreateMarkerDto, @CurrentUser() user: User) {
     return this.markersService.create(createMarkerDto, user);
   }
