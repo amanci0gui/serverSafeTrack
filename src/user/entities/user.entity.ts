@@ -8,4 +8,5 @@ export class User {
   active: boolean;
   role: Role;
   bairroId?: number;
+  isFirstLogin?: boolean;
 }

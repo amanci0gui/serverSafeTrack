@@ -21,7 +21,8 @@ export class AuthService {
     private readonly mailerService: MailerService,
   ) {}
 
-  login(user: User): UserToken {
+  async login(user: User): Promise<UserToken> {
+
     //Transforma o user em um JWT
     const payload: UserPayload = {
       sub: user.id ?? 0,
@@ -29,13 +30,28 @@ export class AuthService {
       name: user.name,
       role: user.role,
     };
-
     //gera o token jwt
     const jwtToken = this.jwtService.sign(payload);
 
+  
     return {
       access_token: jwtToken,
     };
+  }
+
+  async updateFirstLoginStatus(userId: number){
+
+    const user = await this.prismaService.user.findUnique({ where: { id: userId } });
+    if (!user) throw new BadRequestException('Usuário nao encontrado');
+
+    if (user.isFirstLogin === false) return;
+
+    await this.prismaService.user.update({
+      where: { id: userId },
+      data: { isFirstLogin: false },
+    })
+
+    return { message: 'Vimos que é sua primeira vez logando no sistema. Bem vindo! Recomendamos que troque a senha que o representante te atribuiu por questões de segurança.'}
   }
 
   async validateUser(email: string, password: string) {

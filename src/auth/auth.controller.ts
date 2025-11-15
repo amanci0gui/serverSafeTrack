@@ -22,8 +22,18 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
-  login(@Request() req: AuthRequest) {
-    return this.authService.login(req.user);
+  async login(@Request() req: AuthRequest) {
+    const user = req.user;
+    let message: string | undefined = undefined;
+
+    if (user.isFirstLogin) {
+       const firstLoginResponse = await this.authService.updateFirstLoginStatus(user.id!);
+       message = firstLoginResponse?.message;
+    } 
+
+    const userLogged = await this.authService.login(user);
+
+    return { ...userLogged, message };
   }
 
   //Esse endpoint é para quando o usuário sabe a senha antiga e quer trocar

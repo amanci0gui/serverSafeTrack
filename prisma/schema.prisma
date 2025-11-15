@@ -41,7 +41,8 @@ model User {
   bairro   Bairro? @relation("UsuariosPorBairro", fields: [bairroId], references: [id])
 
   // relação 1:1 como representante (um representante só pode ter um bairro)
-  adminBairro Bairro? @relation("AdminDoBairro")
+  adminBairro  Bairro? @relation("AdminDoBairro")
+  isFirstLogin Boolean @default(true)
 
   marker Marker[]
 }
