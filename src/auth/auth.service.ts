@@ -51,6 +51,10 @@ export class AuthService {
       data: { isFirstLogin: false },
     })
 
+    if (user.role === 'REPRESENTANTE' || user.role === 'ADMIN') {
+      return;
+    }
+
     return { message: 'Vimos que é sua primeira vez logando no sistema. Bem vindo! Recomendamos que troque a senha que o representante te atribuiu por questões de segurança.'}
   }
 
