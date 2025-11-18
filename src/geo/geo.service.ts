@@ -46,4 +46,32 @@ export class GeoService {
 
     return inside;
   }
+
+  async calculatePolygonCentroid(type: string, polygon: { lat: number; lng: number }[]) {
+    let geoJson: any;
+
+    if (type === 'Polygon') {
+      // Cria um GeoJSON do tipo Polygon
+      geoJson = turf.polygon([
+        polygon.map((point) => [point.lng, point.lat]), // Turf usa [lng, lat]
+      ]);
+    } else if (type === 'MultiPolygon') {
+      // Cria um GeoJSON do tipo MultiPolygon
+      geoJson = turf.multiPolygon([
+        [
+          polygon.map((point) => [point.lng, point.lat]), // Turf usa [lng, lat]
+        ],
+      ]);
+    } else {
+      throw new Error('Tipo de polígono inválido');
+    }
+
+    // Calcula o centroide do Polygon ou MultiPolygon
+    const centroid = turf.centroid(geoJson);
+
+    return {
+      lat: centroid.geometry.coordinates[1],
+      lng: centroid.geometry.coordinates[0],
+    };
+  }
 }
