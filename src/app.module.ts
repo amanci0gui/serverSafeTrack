@@ -12,6 +12,7 @@ import { MapsModule } from './maps/maps.module';
 import { MarkersModule } from './markers/markers.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { BairroModule } from './bairro/bairro.module';
 import * as path from 'path';
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import * as path from 'path';
     AuthModule,
     MapsModule,
     MarkersModule,
+    BairroModule,
   ],
   controllers: [AppController],
   providers: [
