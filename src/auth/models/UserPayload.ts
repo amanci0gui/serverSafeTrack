@@ -5,6 +5,7 @@ export interface UserPayload {
   email: string;
   name: string;
   role: Role;
+  bairroId: number | null;
   iat?: number;
   exp?: number;
 }

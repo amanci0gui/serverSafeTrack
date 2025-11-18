@@ -29,6 +29,7 @@ export class AuthService {
       email: user.email,
       name: user.name,
       role: user.role,
+      bairroId: user.bairroId ?? null,  
     };
     //gera o token jwt
     const jwtToken = this.jwtService.sign(payload);
