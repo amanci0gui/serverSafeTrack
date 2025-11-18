@@ -19,6 +19,18 @@ export class BairroService {
         });
     }
 
+    async getBairrosByCidade(cidade: string) {
+        return await this.prismaService.bairro.findMany({
+            where: { cidade },
+        });
+    }
+
+    async getBairroByNameAndCidade(name: string, cidade: string) {
+        return await this.prismaService.bairro.findFirst({
+            where: { name, cidade },
+        });
+    }
+
     async getBairroPolygon(id: number) {
         const polygon = await this.prismaService.bairro.findUnique({
             where: { id },
