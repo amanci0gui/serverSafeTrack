@@ -20,4 +20,10 @@ export class PlacesController {
   findCoordinates(@Query('latitude') latitude: number, @Query('longitude') longitude: number) {
     return this.placesService.findCoordinates(latitude, longitude);
   }
+
+  @Roles('USER', 'REPRESENTANTE', 'USER')
+  @Get('place-details')
+  getPlaceDetails(@Query('placeId') placeId: string) {
+    return this.placesService.getPlaceDetails(placeId);
+  }
 }
