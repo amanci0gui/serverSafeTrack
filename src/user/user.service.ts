@@ -62,7 +62,7 @@ export class UserService {
         id: result.createdUser.id,
         name: result.createdUser.name,
         email: result.createdUser.email,
-        role: result.createdUser.role,
+        role: 'REPRESENTANTE',
       },
       bairro: {
         id: result.updatedBairro.id,
@@ -117,7 +117,7 @@ export class UserService {
         id: createdUser.id,
         name: createdUser.name,
         email: createdUser.email,
-        role: createdUser.role,
+        role: 'USER',
       },
       bairro: {
         id: updatedBairro.id,
