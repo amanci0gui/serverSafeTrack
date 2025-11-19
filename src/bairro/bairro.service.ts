@@ -12,24 +12,50 @@ export class BairroService {
     ) {}
 
     async getBairros() {
-        return await this.prismaService.bairro.findMany();
+        return await this.prismaService.bairro.findMany({
+            select: {
+                id: true,
+                name: true,
+                cidade: true,
+                adminId: true
+            },
+        });
     }
 
     async getBairroById(id: number) {
         return await this.prismaService.bairro.findUnique({
             where: { id },
+            select: {
+                id: true,
+                name: true,
+                cidade: true,
+                adminId: true
+            },
         });
     }
 
     async getBairrosByCidade(cidade: string) {
         return await this.prismaService.bairro.findMany({
             where: { cidade },
+            select: {
+                id: true,
+                name: true,
+                cidade: true,
+                adminId: true
+            },
+
         });
     }
 
     async getBairroByNameAndCidade(name: string, cidade: string) {
         return await this.prismaService.bairro.findFirst({
             where: { name, cidade },
+            select: {
+                id: true,
+                name: true,
+                cidade: true,
+                adminId: true
+            },
         });
     }
 
