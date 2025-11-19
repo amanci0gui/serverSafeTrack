@@ -7,37 +7,38 @@ export class BairroController {
   constructor(private readonly bairroService: BairroService) {}
 
   @Get()
-  findAll() {
-    return this.bairroService.getBairros();
+  async findAll() {
+    return await this.bairroService.getBairros();
   }
 
   @Get(':id')
-  findBairroById(@Param('id') id: number) {
-    return this.bairroService.getBairroById(id);
+  async findBairroById(@Param('id') id: number) {
+    return await this.bairroService.getBairroById(id);
   }
 
+  @IsPublic()
   @Get('cidade/:cidade/nome/:nome')
-  findBairroByNameAndCidade(
+  async findBairroByNameAndCidade(
     @Param('cidade') cidade: string,
     @Param('nome') nome: string,
   ) {
-    return this.bairroService.getBairroByNameAndCidade(nome, cidade);
+    return await this.bairroService.getBairroByNameAndCidade(nome, cidade);
   }
 
   @Get('cidade/:cidade')
-  findBairrosByCidade(@Param('cidade') cidade: string) {
-    return this.bairroService.getBairrosByCidade(cidade);
+  async findBairrosByCidade(@Param('cidade') cidade: string) {
+    return await this.bairroService.getBairrosByCidade(cidade);
   }
 
   @Get('polygon/:idBairro')
-  findPolygonByBairroId(@Param('idBairro') id: number) {
-    return this.bairroService.getBairroPolygon(id);
+  async findPolygonByBairroId(@Param('idBairro') id: number) {
+    return await this.bairroService.getBairroPolygon(id);
   }
 
   @IsPublic()
   @Get('centro/:idBairro')
   async findBairroCentroById(@Param('idBairro') id: number) {
-    return this.bairroService.getBairroCentroById(id);
+    return await this.bairroService.getBairroCentroById(id);
   }
 
 }
