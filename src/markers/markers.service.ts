@@ -30,12 +30,22 @@ export class MarkersService {
       );
     }
 
+    const referenceTime = createMarkerDto.dateTime
+      ? new Date(createMarkerDto.dateTime)
+      : new Date();
+    const intervalMs = 20 * 60 * 1000; // 20 minutos em ms
+    const startTime = new Date(referenceTime.getTime() - intervalMs);
+    const endTime = new Date(referenceTime.getTime() + intervalMs);
+
     const existingMarker = await this.prisma.marker.findFirst({
       where: {
         latitude: createMarkerDto.latitude,
         longitude: createMarkerDto.longitude,
-        title: createMarkerDto.title,
         category: createMarkerDto.category,
+        createdAt: {
+          gte: startTime,
+          lte: endTime,
+        }
       },
     });
 
