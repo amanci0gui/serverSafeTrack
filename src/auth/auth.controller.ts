@@ -24,7 +24,7 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   async login(@Request() req: AuthRequest) {
     const user = req.user;
-    let message: string | undefined = undefined;
+    let message: string | undefined = '';
 
     if (user.isFirstLogin) {
        const firstLoginResponse = await this.authService.updateFirstLoginStatus(user.id!);
