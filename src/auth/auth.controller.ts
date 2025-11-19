@@ -13,6 +13,10 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthRequest } from './models/AuthRequest';
 import { IsPublic } from './decorators/is-public.decorator';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { VerifyResetTokenDto } from './dto/verify-reset-token.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import ForgotPasswordDto from './dto/forgot-password.dto';
 
 @Controller()
 export class AuthController {
@@ -46,20 +50,20 @@ export class AuthController {
 
   @IsPublic()
   @Post('forgot-password')
-  async forgotPassword(@Body('email') email: string) {
-    return this.authService.forgotPassword(email);
+  async forgotPassword(@Body() body: ForgotPasswordDto) {
+    return this.authService.forgotPassword(body.email);
   }
 
   @IsPublic()
   @Post('verify-reset-token')
-  async verifyResetToken(@Body() body: { email: string; token: string }) {
+  async verifyResetToken(@Body() body: VerifyResetTokenDto) {
     return this.authService.verifyResetToken(body.email, body.token);
   }
 
   @IsPublic()
   @Patch('reset-password')
   async resetPassword(
-    @Body() body: { email: string; token: string; newPassword: string },
+    @Body() body: ResetPasswordDto,
   ) {
     return this.authService.resetPassword(
       body.email,
