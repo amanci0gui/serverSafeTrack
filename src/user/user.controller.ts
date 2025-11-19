@@ -6,6 +6,7 @@ import { Role, User } from '@prisma/client';
 import { Roles } from 'src/auth/decorators/roles.decorators';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { IsOptional } from 'class-validator';
+import ChangeRoleDto from './dto/change-role.dto';
 
 @Controller('user')
 export class UserController {
@@ -38,13 +39,12 @@ export class UserController {
   @Put(':userId/change-role')
   changeRole(
     @Param('userId') id: number,
-    @Body('role') role: Role,
-    @Body('bairroId') bairroId?: number,
+    @Body() dto: ChangeRoleDto,
   ) {
     return this.userService.changeRole(
       id,
-      role,
-      bairroId ? bairroId : undefined,
+      dto.role,
+      dto.bairroId ? dto.bairroId : undefined,
     );
   }
 

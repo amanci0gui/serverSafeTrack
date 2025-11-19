@@ -13,10 +13,11 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthRequest } from './models/AuthRequest';
 import { IsPublic } from './decorators/is-public.decorator';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiBody, ApiProperty } from '@nestjs/swagger';
 import { VerifyResetTokenDto } from './dto/verify-reset-token.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import ForgotPasswordDto from './dto/forgot-password.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Controller()
 export class AuthController {
@@ -26,6 +27,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
+  @ApiBody({ type: LoginDto })
   async login(@Request() req: AuthRequest) {
     const user = req.user;
     let message: string | undefined = '';
