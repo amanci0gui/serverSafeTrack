@@ -35,7 +35,6 @@ export class BairroController {
     return await this.bairroService.getBairroPolygon(id);
   }
 
-  @IsPublic()
   @Get('centro/:idBairro')
   async findBairroCentroById(@Param('idBairro') id: number) {
     return await this.bairroService.getBairroCentroById(id);

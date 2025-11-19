@@ -35,9 +35,9 @@ export class MarkersController {
     return this.markersService.findOne(id);
   }
 
-  @Get(':userId')
-  findByUser(@Param('userId') userId: number) {
-    return this.markersService.findByUser(userId);
+  @Get('user/:userId')
+  async findByUser(@Param('userId') userId: number, @CurrentUser() user: User) {
+    return await this.markersService.findByUser(userId ? userId : user.id);
   }
 
   @Roles('USER')
