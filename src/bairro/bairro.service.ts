@@ -62,11 +62,22 @@ export class BairroService {
             throw new Error('Estrutura do polígono inválida');
         }
 
-        // Converte as coordenadas [lng, lat] para o formato { lat, lng }
-        const coordinates = polygonData.coordinates[0].map(coord => ({
-            lat: coord[1],
-            lng: coord[0]
-        }));
+        // Verifica se é MultiPolygon ou Polygon
+        let coordinates: { lat: number; lng: number; }[];
+        
+        if (polygonData.type === 'MultiPolygon') {
+            // Para MultiPolygon, pega o primeiro polígono e seu primeiro anel
+            coordinates = polygonData.coordinates[0][0].map(coord => ({
+                lat: coord[1],
+                lng: coord[0]
+            }));
+        } else {
+            // Para Polygon, pega o primeiro anel (contorno externo)
+            coordinates = polygonData.coordinates[0].map(coord => ({
+                lat: coord[1],
+                lng: coord[0]
+            }));
+        }
 
         return this.geoService.calculatePolygonCentroid(polygonData.type, coordinates);
     }
