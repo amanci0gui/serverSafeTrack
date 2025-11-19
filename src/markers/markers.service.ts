@@ -26,7 +26,7 @@ export class MarkersService {
 
     if (!canCreateMarker) {
       throw new ForbiddenException(
-        `Você não pode criar um marcador fora da região ABC!`,
+        `Você não pode criar um marcador fora do bairro que foi cadastrado!`,
       );
     }
 
