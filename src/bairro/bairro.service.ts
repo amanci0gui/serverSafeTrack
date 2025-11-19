@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { GeoService } from 'src/geo/geo.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { GeoJsonPolygon } from './types/types';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class BairroService {
@@ -44,8 +46,29 @@ export class BairroService {
         return polygon;
     }
 
-    async getBairroCentro(type: string, polygon: { lat: number; lng: number }[]) {
-        return this.geoService.calculatePolygonCentroid(type,polygon);
+    async getBairroCentroById(id: number) {
+        const bairro = await this.prismaService.bairro.findUnique({
+            where: { id },
+            select: { polygon: true },
+        });
+
+        if (!bairro || !bairro.polygon) {
+            throw new Error('Bairro não encontrado');
+        }
+
+        const polygonData = bairro.polygon as unknown as GeoJsonPolygon;
+        
+        if (!polygonData.type || !polygonData.coordinates) {
+            throw new Error('Estrutura do polígono inválida');
+        }
+
+        // Converte as coordenadas [lng, lat] para o formato { lat, lng }
+        const coordinates = polygonData.coordinates[0].map(coord => ({
+            lat: coord[1],
+            lng: coord[0]
+        }));
+
+        return this.geoService.calculatePolygonCentroid(polygonData.type, coordinates);
     }
 
 }
