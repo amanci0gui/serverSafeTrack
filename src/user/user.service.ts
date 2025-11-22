@@ -21,6 +21,7 @@ export class UserService {
 
     return this.prisma.user.findMany();
   }
+
   async createRepresentante(createUserDto: CreateUserDto, user: User) {
     if (user.role !== 'ADMIN') throw new UnauthorizedException('Apenas administradores podem criar representantes.');
 
@@ -128,6 +129,19 @@ export class UserService {
     }
   }
 
+  async getUserById(id: number) {
+    return await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        bairroId: true,
+      },
+    });
+  }
+  
   async findByEmail(email: string) {
     return this.prisma.user.findUnique({
       where: { email },
