@@ -111,7 +111,7 @@ export class MarkersService {
       ); //lança uma exceção se o marcador foi removido ou não existe
     }
 
-    if (marker.userId !== user.id && user.role !== 'ADMIN') {
+    if (marker.userId !== user.id && user.role !== 'REPRESENTANTE') {
       throw new ForbiddenException(
         `Você não tem permissão para remover este marcador, pois não foi você quem o criou`,
       ); //lança uma exception se não for o dono quem está excluindo

@@ -40,8 +40,7 @@ export class MarkersController {
     return await this.markersService.findByUser(userId ? userId : user.id);
   }
 
-  @Roles('USER')
-  @Roles('ADMIN')
+  @Roles('REPRESENTANTE','USER')
   @Delete(':id')
   @HttpCode(204)
   remove(@Param('id') id: string, @CurrentUser() user: User) {
