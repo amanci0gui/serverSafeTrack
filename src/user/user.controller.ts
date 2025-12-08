@@ -1,11 +1,9 @@
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from './user.service';
-import { IsPublic } from 'src/auth/decorators/is-public.decorator';
-import { Role, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { Roles } from 'src/auth/decorators/roles.decorators';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
-import { IsOptional } from 'class-validator';
 import ChangeRoleDto from './dto/change-role.dto';
 
 @Controller('user')
@@ -48,10 +46,16 @@ export class UserController {
     );
   }
 
-  @Roles('REPRESENTANTE', 'ADMIN')
+  @Roles('ADMIN')
   @Get()
   findAll(@CurrentUser() user: User) {
     return this.userService.findAll(user);
+  }
+
+  @Roles('REPRESENTANTE', 'ADMIN')
+  @Get('bairro')
+  findByBairro(@CurrentUser() user: User) {
+    return this.userService.findByBairro(user);
   }
 
   @Get(':id')

@@ -9,18 +9,51 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { $Enums, Role, User } from '@prisma/client';
 
+// associate neighborhood name with user information
+const userSelectFields = {
+    id: true,
+    name: true,
+    email: true,
+    role: true,
+    active: true,
+    bairro: {
+      select: {
+        name: true,
+      },
+    },
+};
+
 @Injectable()
 export class UserService {
 
   constructor(private readonly prisma: PrismaService) {}
   
   findAll(user: User) {
-    if (user.role !== 'ADMIN' && user.role !== 'REPRESENTANTE') {
+    if (user.role !== 'ADMIN') {
+      throw new UnauthorizedException('Apenas administradores podem acessar a lista de todos os usuários'); 
+    }
+
+    return this.prisma.user.findMany({
+        select: userSelectFields,
+    });
+  }
+
+  async findByBairro(user: User) {
+    const { role, bairroId } = user;
+
+    if (role !== 'ADMIN' && role !== 'REPRESENTANTE') {
       throw new UnauthorizedException('Apenas administradores e representantes podem acessar a lista de usuários.'); 
     }
 
-    return this.prisma.user.findMany();
-  }
+    const whereClause = role === 'REPRESENTANTE' && bairroId 
+        ? { bairroId: bairroId } 
+        : {};
+
+    return await this.prisma.user.findMany({
+      where: whereClause,
+      select: userSelectFields,
+    });
+}
 
   async createRepresentante(createUserDto: CreateUserDto, user: User) {
     if (user.role !== 'ADMIN') throw new UnauthorizedException('Apenas administradores podem criar representantes.');
