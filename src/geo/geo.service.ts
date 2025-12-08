@@ -6,6 +6,9 @@ import { Polygon } from 'geojson';
 const prisma = new PrismaClient();
 
 export class GeoService {
+
+  private readonly BUFFER_DISTANCE_METERS = 100;
+
   // Verifica se um ponto está dentro do bairro informado usando Turf.js
   async isInsideBairro(
     longitude: number,
@@ -41,8 +44,18 @@ export class GeoService {
       return false;
     }
 
+    const bufferedPolygon = turf.buffer(polygon, this.BUFFER_DISTANCE_METERS, {
+      units: 'meters',
+    })
+
+    if (!bufferedPolygon) {
+      console.warn('Erro ao criar buffer do polígono');
+      // Fallback: verifica sem buffer
+      return turf.booleanPointInPolygon(point, polygon);
+    }
+
     // Verifica se o ponto está dentro
-    const inside = turf.booleanPointInPolygon(point, polygon);
+    const inside = turf.booleanPointInPolygon(point, bufferedPolygon);
 
     return inside;
   }
