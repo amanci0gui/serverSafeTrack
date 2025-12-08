@@ -1,4 +1,4 @@
-import { Role } from "@prisma/client";
+import { Role } from '@prisma/client';
 
 export class User {
   id?: number;
@@ -7,4 +7,6 @@ export class User {
   name: string;
   active: boolean;
   role: Role;
+  bairroId?: number;
+  isFirstLogin?: boolean;
 }

@@ -13,7 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: process.env.JWT_SECRET!,
-    }); 
+    });
   }
 
   async validate(payload: UserPayload): Promise<UserFromJwt> {
@@ -21,7 +21,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       id: payload.sub,
       email: payload.email,
       name: payload.name,
-      role: payload.role
+      role: payload.role,
+      bairroId: payload.bairroId ?? null,
     };
   }
 }

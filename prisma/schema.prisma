@@ -16,14 +16,72 @@ datasource db {
 enum Role {
   USER
   ADMIN
+  REPRESENTANTE
+}
+
+enum CrimeType {
+  ROUBO
+  FURTO
+  HOMICIDIO
+  FEMINICIDIO
+  VANDALISMO
+  OUTRO
 }
 
 model User {
-  id Int @id @default(autoincrement())
-
+  id       Int     @id @default(autoincrement())
   email    String  @unique
   password String
   name     String
-  active   Boolean @default(true)
   role     Role    @default(USER)
+  active   Boolean @default(true)
+
+  // cada usuário (morador) pertence a um único bairro
+  bairroId Int?
+  bairro   Bairro? @relation("UsuariosPorBairro", fields: [bairroId], references: [id])
+
+  // relação 1:1 como representante (um representante só pode ter um bairro)
+  adminBairro  Bairro? @relation("AdminDoBairro")
+  isFirstLogin Boolean @default(true)
+
+  marker Marker[]
+}
+
+model Bairro {
+  id      Int    @id @default(autoincrement())
+  name    String
+  cidade  String
+  polygon Json?
+
+  // 1:N com usuários (moradores)
+  usuarios User[] @relation("UsuariosPorBairro")
+
+  // 1:1 com admin
+  adminId Int?  @unique
+  admin   User? @relation("AdminDoBairro", fields: [adminId], references: [id])
+
+  markers Marker[]
+
+  @@unique([name, cidade])
+}
+
+model Marker {
+  id String @id @default(uuid())
+
+  title       String
+  description String
+  category    CrimeType
+  dateTime    DateTime
+  latitude    Float
+  longitude   Float
+  createdAt   DateTime  @default(now())
+  active      Boolean   @default(true)
+  userId      Int
+
+  // substituído: usa FK para Bairro para permitir join e obter nome/cidade via relação
+  bairroId Int
+  bairro   Bairro @relation(fields: [bairroId], references: [id])
+
+  //relacionamentos
+  user User @relation(fields: [userId], references: [id])
 }
